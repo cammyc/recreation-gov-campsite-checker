@@ -43,6 +43,7 @@ def main(args, stdin):
     user = args[1].replace("@", "")
 
     first_line = next(stdin)
+    print(first_line)
     first_line_hash = md5(first_line.encode("utf-8")).hexdigest()
 
     delay_file = DELAY_FILE_TEMPLATE.format(first_line_hash)
@@ -52,11 +53,11 @@ def main(args, stdin):
     except:
         call_time = 0
 
-    if call_time + random.randint(DELAY_TIME - 30, DELAY_TIME + 30) > int(
-        time.time()
-    ):
-        print("It is too soon to tweet again")
-        sys.exit(0)
+#    if call_time + random.randint(DELAY_TIME - 30, DELAY_TIME + 30) > int(
+#        time.time()
+#    ):
+#        print("It is too soon to tweet again")
+#        sys.exit(0)
 
     if "Something went wrong" in first_line:
         _create_tweet("{}, I'm broken! Please help :'(".format(user), tc)
@@ -86,6 +87,7 @@ def generate_tweet_str(available_site_strings, first_line, user):
 
 def generate_availability_strings(stdin):
     available_site_strings = []
+    linkedSites = 0
     for line in stdin:
         line = line.strip()
         if Emoji.SUCCESS.value in line:
@@ -95,6 +97,10 @@ def generate_availability_strings(stdin):
                 num_available, park_name_and_id
             )
             available_site_strings.append(s)
+        if "https" in line and linkedSites < 3:
+            index = line.find("camping") - 1
+            available_site_strings.append(line[index:])
+            linkedSites += 1
     return available_site_strings
 
 

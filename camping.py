@@ -4,6 +4,7 @@
 import json
 import logging
 import sys
+import time
 from collections import defaultdict
 from datetime import datetime, timedelta
 from itertools import count, groupby
@@ -232,24 +233,32 @@ def generate_human_output(
                     )
                 )
                 for date in dates:
+                    startInWords = getDateInWords(date["start"])
+                    endInWords = getDateInWords(date["end"])
                     out.append(
                         "    * {start} -> {end}".format(
-                            start=date["start"], end=date["end"]
+                            start=startInWords, end=endInWords
                         )
                     )
+                out.append(
+                    "      * {url}".format(
+                        url=campsiteIdToURL(site_id))
+                )
+#                    out.append('\a')
 
     if has_availabilities:
+        startInWords = getDateInWords(start_date.strftime(DateFormat.INPUT_DATE_FORMAT.value))
+        endInWords = getDateInWords(end_date.strftime(DateFormat.INPUT_DATE_FORMAT.value))
         out.insert(
             0,
             "there are campsites available from {start} to {end}!!!".format(
-                start=start_date.strftime(DateFormat.INPUT_DATE_FORMAT.value),
-                end=end_date.strftime(DateFormat.INPUT_DATE_FORMAT.value),
+                start=startInWords,
+                end=endInWords,
             ),
         )
     else:
         out.insert(0, "There are no campsites available :(")
     return "\n".join(out), has_availabilities
-
 
 def generate_json_output(info_by_park_id):
     availabilities_by_park_id = {}
@@ -261,31 +270,46 @@ def generate_json_output(info_by_park_id):
             availabilities_by_park_id[park_id] = available_dates_by_site_id
 
     return json.dumps(availabilities_by_park_id), has_availabilities
+    
+# **** Move below to new file
+def getDateInWords(date):
+    datetime = getDatetimeFromDate(date)
+    return datetime.strftime('%a') + ", " + datetime.strftime('%b') + " " + datetime.strftime('%d')
+    
+def campsiteIdToURL(id):
+    return "https://www.recreation.gov/camping/campsites/" + str(id)
+    
+def getDatetimeFromDate(date):
+    format_data = "%Y-%m-%d"
+    return datetime.strptime(date, format_data)
 
 
 def main(parks, json_output=False):
-    info_by_park_id = {}
-    for park_id in parks:
-        info_by_park_id[park_id] = check_park(
-            park_id,
-            args.start_date,
-            args.end_date,
-            args.campsite_type,
-            args.campsite_ids,
-            nights=args.nights,
-        )
+    try:
+        info_by_park_id = {}
+        for park_id in parks:
+            info_by_park_id[park_id] = check_park(
+                park_id,
+                args.start_date,
+                args.end_date,
+                args.campsite_type,
+                args.campsite_ids,
+                nights=args.nights,
+            )
 
-    if json_output:
-        output, has_availabilities = generate_json_output(info_by_park_id)
-    else:
-        output, has_availabilities = generate_human_output(
-            info_by_park_id,
-            args.start_date,
-            args.end_date,
-            args.show_campsite_info,
-        )
-    print(output)
-    return has_availabilities
+        if json_output:
+            output, has_availabilities = generate_json_output(info_by_park_id)
+        else:
+            output, has_availabilities = generate_human_output(
+                info_by_park_id,
+                args.start_date,
+                args.end_date,
+                args.show_campsite_info,
+            )
+        print(output)
+        return has_availabilities
+    except Exception as e:
+        print(e)
 
 
 if __name__ == "__main__":
@@ -296,3 +320,4 @@ if __name__ == "__main__":
         LOG.setLevel(logging.DEBUG)
 
     main(args.parks, json_output=args.json_output)
+    
