@@ -244,7 +244,7 @@ def generate_human_output(
                     "      * {url}".format(
                         url=campsiteIdToURL(site_id))
                 )
-#                    out.append('\a')
+                out.append('\a')
 
     if has_availabilities:
         startInWords = getDateInWords(start_date.strftime(DateFormat.INPUT_DATE_FORMAT.value))
@@ -318,6 +318,10 @@ if __name__ == "__main__":
 
     if args.debug:
         LOG.setLevel(logging.DEBUG)
-
-    main(args.parks, json_output=args.json_output)
+    while True:
+        try:
+            main(args.parks, json_output=args.json_output)
+        except Exception as e:
+            print(e)
+        time.sleep(60)
     
