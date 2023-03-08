@@ -323,5 +323,5 @@ if __name__ == "__main__":
             main(args.parks, json_output=args.json_output)
         except Exception as e:
             print(e)
-        time.sleep(60)
+        time.sleep(20)
     
