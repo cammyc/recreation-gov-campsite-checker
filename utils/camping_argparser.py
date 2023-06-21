@@ -55,7 +55,20 @@ class CampingArgumentParser(argparse.ArgumentParser):
                 "This make the script output JSON instead of human readable "
                 "output. Note, this is incompatible with the twitter notifier. "
                 "This output includes more precise information, such as the exact "
-                "avaiable dates and which sites are available."
+                "available dates and which sites are available."
+            ),
+        )
+        self.add_argument(
+            "--weekends-only",
+            action="store_true",
+            help=(
+                "Include only weekends (i.e. starting Friday or Saturday)"
+            ),
+        )
+        self.add_argument(
+            "--exclusion-file",
+            help=(
+                "File with site IDs to exclude"
             ),
         )
         parks_group = self.add_mutually_exclusive_group(required=True)
