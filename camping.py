@@ -308,26 +308,27 @@ def remove_comments(lines: list[str]) -> list[str]:
 
 
 def main(parks, json_output=False):
-    excluded_site_ids = []
+    try:
+        excluded_site_ids = []
 
-    if args.exclusion_file:
-        with open(args.exclusion_file, "r") as f:
-            excluded_site_ids = f.readlines()
-            excluded_site_ids = [l.strip() for l in excluded_site_ids]
-            excluded_site_ids = remove_comments(excluded_site_ids)
+        if args.exclusion_file:
+            with open(args.exclusion_file, "r") as f:
+                excluded_site_ids = f.readlines()
+                excluded_site_ids = [l.strip() for l in excluded_site_ids]
+                excluded_site_ids = remove_comments(excluded_site_ids)
 
-    info_by_park_id = {}
-    for park_id in parks:
-        info_by_park_id[park_id] = check_park(
-            park_id,
-            args.start_date,
-            args.end_date,
-            args.campsite_type,
-            args.campsite_ids,
-            nights=args.nights,
-            weekends_only=args.weekends_only,
-            excluded_site_ids=excluded_site_ids,
-        )
+        info_by_park_id = {}
+        for park_id in parks:
+            info_by_park_id[park_id] = check_park(
+                park_id,
+                args.start_date,
+                args.end_date,
+                args.campsite_type,
+                args.campsite_ids,
+                nights=args.nights,
+                weekends_only=args.weekends_only,
+                excluded_site_ids=excluded_site_ids,
+            )
 
         if json_output:
             output, has_availabilities = generate_json_output(info_by_park_id)
