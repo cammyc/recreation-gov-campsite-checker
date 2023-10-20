@@ -25,6 +25,8 @@ sh = logging.StreamHandler()
 sh.setFormatter(log_formatter)
 LOG.addHandler(sh)
 
+from datetime import datetime
+
 
 def get_park_information(
     park_id, start_date, end_date, campsite_type=None, campsite_ids=(), excluded_site_ids=[]
@@ -266,7 +268,7 @@ def generate_human_output(
             ),
         )
     else:
-        out.insert(0, "There are no campsites available :(")
+        out.insert(0, f"There are no campsites available :( ({datetime.now().strftime('%Y-%m-%d %H:%M:%S')})")
     return "\n".join(out), has_availabilities
 
 def generate_json_output(info_by_park_id):
