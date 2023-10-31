@@ -1,3 +1,4 @@
+python=3.9
 appdirs==1.4.3
 attrs==18.2.0
 black==18.9b0
