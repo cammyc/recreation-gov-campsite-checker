@@ -3,7 +3,8 @@
 
 import json
 import logging
-import sys
+import os
+import platform
 import time
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -219,6 +220,10 @@ def generate_human_output(
         current, maximum, available_dates_by_site_id, park_name = info
         if current:
             emoji = Emoji.SUCCESS.value
+            # Play "ding" sound on linux
+            sound_file_linux = "/usr/share/sounds/freedesktop/stereo/complete.oga"
+            if platform.system() == 'Linux' and os.path.exists(sound_file_linux):
+                os.system(f"paplay {sound_file_linux}")
             has_availabilities = True
         else:
             emoji = Emoji.FAILURE.value
